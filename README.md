@@ -35,6 +35,9 @@ tests/                     pytest
 
 ## 注意
 
+- 提交时 notebook 输出会被 nbstripout 自动清空（git filter），本地文件不受影响。
+  新克隆的机器上要跑一次：`pip install -e ".[dev]" && nbstripout --install --attributes .gitattributes`
+
 - 没有订阅实时行情时 `market_data_type: 3`（延迟数据）即可拉历史 K 线。
 - IBKR 历史数据有节流（pacing）限制，大量拉取请控制频率、分段请求。
 - 每个连接的 clientId 要唯一，Jupyter 和脚本同时连时改不同的 IB_CLIENT_ID。
