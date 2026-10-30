@@ -1,0 +1,26 @@
+[project]
+name = "ibkr-quant"
+version = "0.1.0"
+description = "Data analysis -> quant research project, data sourced from Interactive Brokers (TWS API)"
+requires-python = ">=3.11"
+dependencies = [
+    "ib_async>=1.0",
+    "pandas>=2.2",
+    "numpy>=1.26",
+    "pyarrow>=14",
+    "matplotlib>=3.8",
+    "pyyaml>=6",
+    "python-dotenv>=1.0",
+    "sqlalchemy>=2.0",
+    "psycopg[binary]>=3.1",
+]
+
+[project.optional-dependencies]
+dev = ["ipykernel", "jupyterlab", "pytest"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

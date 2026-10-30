@@ -1,0 +1,15 @@
+# 项目级设置。想覆盖某项时新建 config/settings.local.yaml（已 gitignore）。
+data_dir: data
+market_data_type: 3   # 1=实时 2=冻结 3=延迟 4=延迟冻结；没订阅行情时用 3
+default_universe:
+  - SPY
+  - QQQ
+  - IWM
+  - TLT
+  - GLD
+history:
+  duration: "8 Y"
+  start: "2019-01-01"   # 拉完后只保留这个日期之后的数据
+  bar_size: "1 day"
+  what_to_show: "TRADES"
+  use_rth: true

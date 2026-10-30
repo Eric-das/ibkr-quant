@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.ipynb_checkpoints/
+# secrets & local config
+.env
+config/settings.local.yaml
+# data (太大，不进 git；用脚本可以随时重新拉)
+data/raw/*
+data/processed/*
+!data/**/.gitkeep
+# misc
+.DS_Store
