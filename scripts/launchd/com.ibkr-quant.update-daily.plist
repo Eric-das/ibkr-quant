@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.ibkr-quant.update-daily</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/yuwenhui/Projects/ibkr-quant/.venv/bin/python</string>
+        <string>/Users/yuwenhui/Projects/ibkr-quant/scripts/update_daily.py</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/yuwenhui/Projects/ibkr-quant</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/bin:/bin</string>
+    </dict>
+    <!-- 每天 20:00 伦敦时间（用户在家、TWS 开着的时段；美股盘中，当天 K 线为快照，次日覆盖）。Mac 休眠错过的话会在下次唤醒时补跑一次。 -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>20</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>/Users/yuwenhui/Projects/ibkr-quant/data/logs/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/yuwenhui/Projects/ibkr-quant/data/logs/launchd.err.log</string>
+</dict>
+</plist>

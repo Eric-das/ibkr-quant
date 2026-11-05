@@ -13,3 +13,4 @@ data/processed/*
 !data/**/.gitkeep
 # misc
 .DS_Store
+data/logs/*

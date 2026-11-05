@@ -56,6 +56,14 @@ def upsert_bars(df: pd.DataFrame, symbol: str, bar_size: str = "1 day") -> int:
     return len(rows)
 
 
+def last_ts(symbol: str, bar_size: str = "1 day") -> pd.Timestamp | None:
+    """该标的在库里的最后一根 K 线时间；没有数据返回 None。"""
+    with engine.connect() as c:
+        v = c.execute(sa.text("select max(ts) from bars where symbol = :s and bar_size = :b"),
+                      {"s": symbol.upper(), "b": bar_size}).scalar()
+    return pd.Timestamp(v) if v is not None else None
+
+
 def read_bars(symbol: str, bar_size: str = "1 day", start=None, end=None) -> pd.DataFrame:
     q = "select ts, open, high, low, close, volume, average, bar_count from bars where symbol = :s and bar_size = :b"
     params = {"s": symbol.upper(), "b": bar_size}

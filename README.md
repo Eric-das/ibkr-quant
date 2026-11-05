@@ -15,7 +15,9 @@ src/ibkr_quant/
   analysis/returns.py      收益、波动、Sharpe、最大回撤
 scripts/
   test_connection.py       第一步：能不能连上
-  fetch_history.py         拉数据
+  fetch_history.py         首次全量拉数据
+  update_daily.py          每日增量更新（只补库里最后一根 K 线之后的部分）
+  launchd/                 每日定时任务（install.sh 安装）
   quick_analysis.py        用本地数据做最小分析并出图
 notebooks/                 探索性分析用
 tests/                     pytest
@@ -41,6 +43,13 @@ tests/                     pytest
 - 没有订阅实时行情时 `market_data_type: 3`（延迟数据）即可拉历史 K 线。
 - IBKR 历史数据有节流（pacing）限制，大量拉取请控制频率、分段请求。
 - 每个连接的 clientId 要唯一，Jupyter 和脚本同时连时改不同的 IB_CLIENT_ID。
+
+## 每日更新
+
+- 手动：`python scripts/update_daily.py`（`--dry-run` 只看需要补几天）。按库里 `max(ts)` 算要补的天数，多拉 3 天重叠，upsert 覆盖重复行；落后超过 300 天或库里没有的标的按 `settings.history` 全量重拉。
+- 自动：`bash scripts/launchd/install.sh` 装成 launchd 任务，每天 20:00（伦敦时间）运行。此时美股还在盘中，当天那根 K 线先以快照写入，次日运行时自动被完整数据覆盖；Mac 当时在休眠的话下次唤醒时补跑。卸载加 `uninstall`。
+- 前提是 **TWS 当时处于登录状态**，否则脚本记录错误后退出（退出码 2）。日志在 `data/logs/update_daily.log`。
+- 改股票池：编辑 `config/settings.yaml` 的 `default_universe`，新标的下次运行时自动全量首拉。
 
 ## 下一步路线
 
