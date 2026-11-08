@@ -15,6 +15,9 @@
     <dict>
         <key>PATH</key>
         <string>/opt/homebrew/bin:/usr/bin:/bin</string>
+        <!-- 定时任务用独立的 clientId，避免和手动运行（.env 里的 1）互相占用 -->
+        <key>IB_CLIENT_ID</key>
+        <string>11</string>
     </dict>
     <!-- 每天 20:00 伦敦时间（用户在家、TWS 开着的时段；美股盘中，当天 K 线为快照，次日覆盖）。Mac 休眠错过的话会在下次唤醒时补跑一次。 -->
     <key>StartCalendarInterval</key>

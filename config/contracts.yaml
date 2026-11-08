@@ -1,0 +1,6 @@
+# symbol -> IBKR conId，由 data/contracts.py 自动维护
+GLD: 51529211
+IWM: 9579970
+QQQ: 320227571
+SPY: 756733
+TLT: 15547841

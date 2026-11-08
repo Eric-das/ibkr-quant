@@ -5,26 +5,34 @@
     python scripts/update_daily.py TSLA NVDA    # 指定代码（库里没有的会按 settings.history 做全量首拉）
     python scripts/update_daily.py --dry-run    # 只看每个标的需要补多少天，不连 TWS
 
-前提：TWS 已登录。连不上时退出码 2，并写入 data/logs/update_daily.log。
+前提：TWS 已登录。连不上时退出码 2，整体超过 10 分钟退出码 3，日志在 data/logs/update_daily.log。
 由 launchd 每天定时调用，见 scripts/launchd/。
 """
 from __future__ import annotations
 
 import argparse
 import logging
+import signal
 import sys
 from datetime import datetime, timezone
 
 import pandas as pd
 
 from ibkr_quant.config import DATA_DIR, SETTINGS
-from ibkr_quant.data.fetch import historical_bars, stock
+from ibkr_quant.data.contracts import resolve
+from ibkr_quant.data.fetch import historical_bars
 from ibkr_quant.data.store import save_bars
 from ibkr_quant.db import init_db, last_ts, upsert_bars
 from ibkr_quant.ibkr_client import ib_session
 
 LOG_DIR = DATA_DIR / "logs"
 MAX_INCREMENTAL_DAYS = 300   # 落后超过这个天数就按 settings.history 全量重拉
+RUN_TIMEOUT_SEC = 600        # 整个脚本的硬超时；TWS 断线时请求可能永远不返回（2026-11-06 曾挂 2 天占着 clientId）
+
+
+def _on_timeout(signum, frame):  # noqa: ARG001
+    logging.getLogger("update_daily").error("超过 %d 秒仍未完成，强制退出", RUN_TIMEOUT_SEC)
+    sys.exit(3)
 
 
 def setup_logging() -> logging.Logger:
@@ -57,6 +65,8 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
     log = setup_logging()
+    signal.signal(signal.SIGALRM, _on_timeout)
+    signal.alarm(RUN_TIMEOUT_SEC)
     init_db()
 
     plan = {s: plan_duration(s, a.bar) for s in a.symbols}
@@ -76,8 +86,7 @@ def main() -> int:
     try:
         for s, (dur, last) in plan.items():
             try:
-                con = stock(s)
-                ib.qualifyContracts(con)
+                con = resolve(ib, s)
                 df = historical_bars(ib, con, duration=dur, bar_size=a.bar)
                 if start and not df.empty:
                     df = df[df.index >= pd.Timestamp(start)]

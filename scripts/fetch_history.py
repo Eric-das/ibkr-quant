@@ -11,7 +11,8 @@ import argparse
 import pandas as pd
 
 from ibkr_quant.config import SETTINGS
-from ibkr_quant.data.fetch import historical_bars, stock
+from ibkr_quant.data.contracts import resolve
+from ibkr_quant.data.fetch import historical_bars
 from ibkr_quant.data.store import save_bars
 from ibkr_quant.ibkr_client import ib_session
 
@@ -32,8 +33,7 @@ def main() -> None:
 
     with ib_session() as ib:
         for sym in a.symbols:
-            con = stock(sym)
-            ib.qualifyContracts(con)
+            con = resolve(ib, sym)
             df = historical_bars(ib, con, duration=a.duration, bar_size=a.bar)
             if a.start and not df.empty:
                 df = df[df.index >= pd.Timestamp(a.start)]
